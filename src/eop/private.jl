@@ -92,84 +92,45 @@ end
 
 # Parse the IERS EOP IAU 1980 data in the matrix `eop`, which must have been obtained from
 # the file `finals.all.csv`.
-function _parse_iers_eop_iau_1980(eop::Matrix)
+function _parse_iers_eop_iau_1980(eop::Matrix, header::Matrix{AbstractString})
     # Create the EOP Data structure by creating the interpolations.
     #
     # The interpolation will be linear between two points in the grid. The extrapolation
     # will be flat, considering the nearest point.
     knots::Vector{Float64} = Vector{Float64}(eop[:, 1] .+ 2400000.5)
 
-    if size(eop)[2] == 37
-        return EopIau1980(
-            _create_iers_eop_interpolation(knots, eop[:, 6]),
-            _create_iers_eop_interpolation(knots, eop[:, 8]),
-            _create_iers_eop_interpolation(knots, eop[:, 15]),
-            _create_iers_eop_interpolation(knots, eop[:, 17]),
-            _create_iers_eop_interpolation(knots, eop[:, 20]),
-            _create_iers_eop_interpolation(knots, eop[:, 22]),
-            _create_iers_eop_interpolation(knots, eop[:, 7]),
-            _create_iers_eop_interpolation(knots, eop[:, 9]),
-            _create_iers_eop_interpolation(knots, eop[:, 16]),
-            _create_iers_eop_interpolation(knots, eop[:, 18]),
-            _create_iers_eop_interpolation(knots, eop[:, 21]),
-            _create_iers_eop_interpolation(knots, eop[:, 23]),
-        )
-    else
-        return EopIau1980(
-            _create_iers_eop_interpolation(knots, eop[:, 6]),
-            _create_iers_eop_interpolation(knots, eop[:, 8]),
-            _create_iers_eop_interpolation(knots, eop[:, 11]),
-            _create_iers_eop_interpolation(knots, eop[:, 13]),
-            _create_iers_eop_interpolation(knots, eop[:, 16]),
-            _create_iers_eop_interpolation(knots, eop[:, 18]),
-            _create_iers_eop_interpolation(knots, eop[:, 7]),
-            _create_iers_eop_interpolation(knots, eop[:, 9]),
-            _create_iers_eop_interpolation(knots, eop[:, 12]),
-            _create_iers_eop_interpolation(knots, eop[:, 14]),
-            _create_iers_eop_interpolation(knots, eop[:, 17]),
-            _create_iers_eop_interpolation(knots, eop[:, 19]),
-        )
-    end
+    # The list of EOP columns with which to populate each argument of the EopIau1980 data structure
+    column_names = ["x_pole", "y_pole", "UT1-UTC", "LOD", "dPsi", "dEpsilon", "sigma_x_pole", 
+        "sigma_y_pole", "sigma_UT1-UTC", "sigma_LOD", "sigma_dPsi", "sigma_dEpsilon"]
+
+    column_indices = map(name->findfirst(el->el==name, vec(header)), column_names)
+
+    println(column_indices)
+
+    interpolations = map(index -> _create_iers_eop_interpolation(knots, eop[:, index]), column_indices)
+
+    EopIau1980(interpolations...)
 end
 
 # Parse the IERS EOP IAU 2000A data in the matrix `eop`, which must have been obtained from
 # the file `finals2000A.all.csv`.
-function _parse_iers_eop_iau_2000A(eop::Matrix)
+function _parse_iers_eop_iau_2000A(eop::Matrix, header::Matrix{AbstractString})
     # Create the EOP Data structure by creating the interpolations.
     #
     # The interpolation will be linear between two points in the grid. The extrapolation
     # will be flat, considering the nearest point.
     knots::Vector{Float64} = Vector{Float64}(eop[:, 1] .+ 2400000.5)
 
-    if size(eop)[2] == 37
-        EopIau2000A(
-            _create_iers_eop_interpolation(knots, eop[:, 6]),
-            _create_iers_eop_interpolation(knots, eop[:, 8]),
-            _create_iers_eop_interpolation(knots, eop[:, 15]),
-            _create_iers_eop_interpolation(knots, eop[:, 17]),
-            _create_iers_eop_interpolation(knots, eop[:, 24]),
-            _create_iers_eop_interpolation(knots, eop[:, 26]),
-            _create_iers_eop_interpolation(knots, eop[:, 7]),
-            _create_iers_eop_interpolation(knots, eop[:, 9]),
-            _create_iers_eop_interpolation(knots, eop[:, 16]),
-            _create_iers_eop_interpolation(knots, eop[:, 18]),
-            _create_iers_eop_interpolation(knots, eop[:, 25]),
-            _create_iers_eop_interpolation(knots, eop[:, 27]),
-        )
-    else
-        EopIau2000A(
-            _create_iers_eop_interpolation(knots, eop[:, 6]),
-            _create_iers_eop_interpolation(knots, eop[:, 8]),
-            _create_iers_eop_interpolation(knots, eop[:, 11]),
-            _create_iers_eop_interpolation(knots, eop[:, 13]),
-            _create_iers_eop_interpolation(knots, eop[:, 20]),
-            _create_iers_eop_interpolation(knots, eop[:, 22]),
-            _create_iers_eop_interpolation(knots, eop[:, 7]),
-            _create_iers_eop_interpolation(knots, eop[:, 9]),
-            _create_iers_eop_interpolation(knots, eop[:, 12]),
-            _create_iers_eop_interpolation(knots, eop[:, 14]),
-            _create_iers_eop_interpolation(knots, eop[:, 21]),
-            _create_iers_eop_interpolation(knots, eop[:, 23]),
-        )
-    end
+    # The list of columns to populate each argument of the EopIau2000A data structure
+    #column_names = ["x_pole", "y_pole", "UT1-UTC", "LOD", "dPsi", "dEpsilon", "sigma_x_pole", "sigma_y_pole", "sigma_UT1-UTC", "sigma_LOD", "sigma_dPsi","sigma_dEpsilon"]
+    column_names = ["x_pole", "y_pole", "UT1-UTC", "LOD", "dX", "dY", "sigma_x_pole",
+        "sigma_y_pole", "sigma_UT1-UTC", "sigma_LOD", "sigma_dX", "sigma_dY"]
+
+    column_indices = map(name->findfirst(el->el==name, vec(header)), column_names)
+
+    println(column_indices)
+
+    interpolations = map(index -> _create_iers_eop_interpolation(knots, eop[:, index]), column_indices)
+
+    EopIau2000A(interpolations...)
 end
