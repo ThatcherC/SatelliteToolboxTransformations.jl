@@ -122,7 +122,6 @@ function _parse_iers_eop_iau_2000A(eop::Matrix, header::Matrix{AbstractString})
     knots::Vector{Float64} = Vector{Float64}(eop[:, 1] .+ 2400000.5)
 
     # The list of columns to populate each argument of the EopIau2000A data structure
-    #column_names = ["x_pole", "y_pole", "UT1-UTC", "LOD", "dPsi", "dEpsilon", "sigma_x_pole", "sigma_y_pole", "sigma_UT1-UTC", "sigma_LOD", "sigma_dPsi","sigma_dEpsilon"]
     column_names = ["x_pole", "y_pole", "UT1-UTC", "LOD", "dX", "dY", "sigma_x_pole",
         "sigma_y_pole", "sigma_UT1-UTC", "sigma_LOD", "sigma_dX", "sigma_dY"]
 
