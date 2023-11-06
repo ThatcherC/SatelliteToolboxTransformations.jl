@@ -105,8 +105,6 @@ function _parse_iers_eop_iau_1980(eop::Matrix, header::Matrix{AbstractString})
 
     column_indices = map(name->findfirst(el->el==name, vec(header)), column_names)
 
-    println(column_indices)
-
     interpolations = map(index -> _create_iers_eop_interpolation(knots, eop[:, index]), column_indices)
 
     EopIau1980(interpolations...)
@@ -126,8 +124,6 @@ function _parse_iers_eop_iau_2000A(eop::Matrix, header::Matrix{AbstractString})
         "sigma_y_pole", "sigma_UT1-UTC", "sigma_LOD", "sigma_dX", "sigma_dY"]
 
     column_indices = map(name->findfirst(el->el==name, vec(header)), column_names)
-
-    println(column_indices)
 
     interpolations = map(index -> _create_iers_eop_interpolation(knots, eop[:, index]), column_indices)
 
